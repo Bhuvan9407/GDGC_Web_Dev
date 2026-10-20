@@ -1,0 +1,17 @@
+{
+  "name": "art-studio",
+  "version": "1.0.0",
+  "description": "Art Studio Website - GDGC Web Dev Project",
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "seed": "npm --prefix server run seed",
+    "dev:server": "npm --prefix server start",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "npm --prefix client run build",
+    "test": "node test_api.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
