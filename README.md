@@ -1,7 +1,7 @@
 # KalaKriti Art Studio — Full-Stack Web Platform
 
 > **Google Developer Groups on Campus (GDGC)** — Web Development Volunteer Recruitment Assignment  
-> Handcrafted with **React + Vite**, **Node.js + Express**, **MySQL**, and **Google Material Design 3**.
+> Handcrafted with **Vanilla HTML, CSS & ES Modules**, **Node.js + Express**, **MySQL**, and **Google Material Design 3**.
 
 ---
 
@@ -18,7 +18,8 @@ A dedicated **Studio Administrator** role oversees inventory, reviews orders, co
 
 ## 🚀 Key Features & Highlights
 
-- **Google Material Design 3 UI**: Implemented with pure CSS custom property tokens (`--md-sys-color-primary`, `--md-shape-corner-*`, `--md-elevation-*`), Roboto typography, and Google Material Symbols.
+- **Google Material Design 3 UI**: Implemented with pure CSS custom property tokens (`--md-sys-color-primary`, `--md-shape-corner-*`, `--md-elevation-*`), curated typography (Cinzel, Cormorant Garamond, Plus Jakarta Sans), and Google Material Symbols.
+- **Zero-Framework Frontend**: Built entirely with vanilla HTML5, CSS3, and native ES Modules — no React, no Vue, no Angular. Dynamic UI is driven by clean DOM manipulation and modular JavaScript files.
 - **Strict Role-Based Access Control (RBAC)**: Server-side validation on every endpoint. Customers cannot perform studio operations (403), unauthorized callers receive 401, and cross-customer record tampering returns 404.
 - **Atomic Concurrency Prevention**:
   - **No Duplicate Artwork Purchases**: MySQL transactions with atomic conditional updates ensure that two simultaneous requests for the same painting cannot both succeed.
@@ -32,8 +33,10 @@ A dedicated **Studio Administrator** role oversees inventory, reviews orders, co
 
 | Technology | Purpose | Justification |
 | :--- | :--- | :--- |
-| **React 18 & Vite** | Frontend Architecture | Fast modern bundler with instant HMR and clean functional components without heavy framework overhead. |
-| **Plain CSS & Material Design 3** | Visual Design & Styling | Follows official Google M3 design token guidelines without third-party UI bloat, keeping code readable for interview defense. |
+| **Vanilla HTML5 & CSS3** | Frontend Structure & Visual Design | Pure semantic HTML with no framework overhead; CSS custom properties implement the full M3 design token system without any build step for styles. |
+| **Native ES Modules (`.js`)** | Frontend Logic | Browser-native module system with `import`/`export`; Vite is used only as a zero-config dev server and static asset proxy — no JSX transform or virtual DOM needed. |
+| **Vite** | Dev Server & Build | Provides instant HMR, `/api` proxy to the backend, and an optimised production build for vanilla JS/HTML — keeps setup minimal and fast. |
+| **Google Material Design 3** | Design System | Custom CSS token layer following official M3 guidelines; component styles are class-driven and composable without any third-party UI library. |
 | **Node.js & Express** | Backend REST API | Lightweight, modular REST architecture with straightforward middleware pipelines. |
 | **MySQL & mysql2/promise** | Relational Database | ACID transactions, foreign keys, row-level locks, and strict relational integrity across orders and bookings. |
 | **express-session & express-mysql-session** | Authentication Store | Secure server-side sessions stored persistently in MySQL with `httpOnly` and `sameSite` cookie security. |
@@ -107,7 +110,7 @@ npm run dev
   ```powershell
   npm run dev:server
   ```
-- **Terminal 2 (Frontend Client)**:
+- **Terminal 2 (Frontend Client — Vite dev server)**:
   ```powershell
   npm run dev:client
   ```
@@ -129,7 +132,7 @@ Open your browser and navigate to: **`http://localhost:5173`**
 - Click **"Sign In"** in the top navigation bar.
 - Switch to the **"Customer Register"** tab.
 - Enter your Name, Email, and a Password (minimum 6 characters) to create an account.
-- Once registered, you will be automatically signed in as a `customer` with access to the **"My Dashboard"** section.
+- Once registered, you will be automatically signed in as a `customer` with access to the **"My Collection"** section.
 
 ---
 
@@ -160,8 +163,8 @@ This tests the full business logic against Express and MySQL:
 ### Manual Verification Flow
 1. **Browse Gallery**: Visit `http://localhost:5173`. Notice 12 authentic paintings; paintings `p-004` and `p-009` are marked `SOLD`.
 2. **Buy a Painting**: Sign in as a customer, click **"Buy Now"** on an available painting. Confirm the order. The painting card immediately transitions to `SOLD`.
-3. **Cancel Order**: Go to **My Dashboard -> My Orders**. Click **"Cancel Order"**. The order becomes `CANCELLED` and returning to the gallery shows the painting is `AVAILABLE` again!
-4. **Wall Mural Booking**: Go to **My Dashboard -> Wall-Painting Bookings**. Pick a date between 7 and 90 days away, adjust the wall size (e.g., 100 sq ft), enter an address, and submit. The server calculates the exact total (₹15,000).
+3. **Cancel Order**: Go to **My Collection → My Orders**. Click **"Cancel Order"**. The order becomes `CANCELLED` and returning to the gallery shows the painting is `AVAILABLE` again!
+4. **Wall Mural Booking**: Go to **My Collection → Wall-Painting Bookings**. Pick a date between 7 and 90 days away, adjust the wall size (e.g., 100 sq ft), enter an address, and submit. The server calculates the exact total (₹15,000).
 5. **Studio Decision**: Log out, sign in with the Studio account (`studio@artstudio.in` / `Studio@123`), open **Studio Admin**, review the booking, and click **Confirm** or **Decline**.
 
 ---
@@ -170,30 +173,21 @@ This tests the full business logic against Express and MySQL:
 
 ```
 GDGC_Web/
-├── client/                     # Frontend Application
+├── client/                     # Frontend Application (Vanilla HTML/CSS/JS)
 │   ├── public/
 │   │   └── images/             # Seed painting image assets (p-001.jpg - p-012.jpg)
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── AuthModal.jsx   # Login & Customer Registration Dialog
-│   │   │   ├── EmptyState.jsx  # Empty state visual placeholder
-│   │   │   ├── ErrorBanner.jsx # Error container banner with retry
-│   │   │   ├── LoadingSpinner.jsx # Accessible progress indicator
-│   │   │   ├── Modal.jsx       # Material 3 accessible dialog
-│   │   │   ├── Navbar.jsx      # Top app bar with user role chip
-│   │   │   ├── PaintingCard.jsx# Elevated card with M3 typography & buttons
-│   │   │   └── StatusChip.jsx  # Color-coded M3 status chips
-│   │   ├── pages/
-│   │   │   ├── CataloguePage.jsx   # Painting gallery with filters & buy modal
-│   │   │   ├── CustomerDashboard.jsx # Orders, Bookings & Pottery tabs
-│   │   │   └── StudioDashboard.jsx # Inventory, Orders, Bookings & Pottery admin
 │   │   ├── api.js              # Centralized fetch wrapper with credentials
-│   │   ├── App.jsx             # Main application layout and navigation
-│   │   ├── main.jsx            # React root mount
+│   │   ├── auth.js             # Auth state, login/register modal, nav user controls
+│   │   ├── catalogue.js        # Painting gallery with filters & buy modal (DOM-driven)
+│   │   ├── customer-dashboard.js # Orders, Bookings & Pottery tabs (vanilla JS)
+│   │   ├── main.js             # Application entry: view router & module orchestration
+│   │   ├── modal.js            # Accessible dialog helper (M3 modal component)
+│   │   ├── studio-dashboard.js # Inventory, Orders, Bookings & Pottery admin (vanilla JS)
 │   │   └── theme.css           # Material 3 CSS tokens, components & utilities
-│   ├── index.html              # Entry HTML with Roboto & Material Symbols
-│   ├── package.json            # Client dependencies
-│   └── vite.config.js          # Vite config with API proxy
+│   ├── index.html              # Single HTML shell with header, main, footer & toast/modal containers
+│   ├── package.json            # Client dependencies (Vite only — no React)
+│   └── vite.config.js          # Vite config with /api & /images proxy to backend
 ├── server/                     # Backend API & Database
 │   ├── data/
 │   │   ├── images/             # Original seed painting assets
