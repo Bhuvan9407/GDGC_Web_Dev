@@ -14,8 +14,13 @@
 
 const http = require('http');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
-require('dotenv').config();
+try {
+  require('dotenv').config({ path: path.join(__dirname, '.env') });
+} catch (e) {
+  try {
+    require(path.join(__dirname, 'server', 'node_modules', 'dotenv')).config({ path: path.join(__dirname, '.env') });
+  } catch (err) {}
+}
 
 const app = require('./server/index');
 const { pool, ensureDatabaseExists } = require('./server/db');
@@ -132,6 +137,10 @@ async function runTests() {
     // 1. Database Seeding & Idempotence
     console.log('1. Database Initialization & Seeding');
     await seedDatabase(false);
+    // Ensure seed initial availability states for test assertions
+    await pool.query("UPDATE paintings SET status = 'available' WHERE id IN ('p-001', 'p-002', 'p-003', 'p-005', 'p-006', 'p-007', 'p-008', 'p-010', 'p-011', 'p-012')");
+    await pool.query("UPDATE paintings SET status = 'sold' WHERE id IN ('p-004', 'p-009')");
+    await pool.query("DELETE FROM wall_bookings WHERE booking_date IN (?, ?)", [getFutureDate(20), getFutureDate(25)]);
     assert(true, 'Idempotent seed executed without throwing errors');
 
     // 2. Public Paintings Catalogue
@@ -412,6 +421,7 @@ async function runTests() {
   } finally {
     if (server) server.close();
     await pool.end();
+    process.exit(process.exitCode || 0);
   }
 }
 

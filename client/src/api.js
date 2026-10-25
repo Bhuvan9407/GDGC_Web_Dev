@@ -1,35 +1,48 @@
 /**
- * Centralized API Client for Art Studio
- * Automatically manages credentials, headers, and error parsing.
+ * KalaKriti Art Studio — Centralized API Client
+ *
+ * Handles HTTP requests to the Express backend via fetch() with:
+ * - Session cookies automatically included (credentials: 'include')
+ * - Automatic JSON serialization and header setting
+ * - Standardized error extraction and propagation
  */
 
 const BASE_URL = '/api';
 
+/**
+ * Core HTTP helper function
+ * @param {string} endpoint - API route path e.g. '/paintings'
+ * @param {object} options - Request options (method, body, headers)
+ * @returns {Promise<any>} Parsed response data
+ */
 async function request(endpoint, options = {}) {
   const config = {
     ...options,
-    credentials: 'include',
+    credentials: 'include', // Crucial for persistent Express session cookies
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
     },
   };
 
+  // Convert JavaScript objects into JSON string for POST / PATCH bodies
   if (options.body && typeof options.body === 'object') {
     config.body = JSON.stringify(options.body);
   }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
+  // Parse JSON response body if available
   let data = null;
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
     data = await response.json();
   }
 
+  // Handle non-2xx HTTP responses
   if (!response.ok) {
-    const errorMsg = (data && data.error) || (data && data.message) || `HTTP error ${response.status}`;
-    const error = new Error(errorMsg);
+    const message = (data && data.error) || (data && data.message) || `HTTP error ${response.status}`;
+    const error = new Error(message);
     error.status = response.status;
     error.data = data;
     throw error;
@@ -39,7 +52,7 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  // Authentication
+  // Authentication & Session
   auth: {
     register: (body) => request('/auth/register', { method: 'POST', body }),
     login: (body) => request('/auth/login', { method: 'POST', body }),
@@ -47,7 +60,7 @@ export const api = {
     getMe: () => request('/auth/me', { method: 'GET' }),
   },
 
-  // Paintings
+  // Paintings Catalogue
   paintings: {
     getAll: () => request('/paintings', { method: 'GET' }),
     create: (body) => request('/paintings', { method: 'POST', body }),

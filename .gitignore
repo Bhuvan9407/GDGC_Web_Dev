@@ -10,12 +10,15 @@ package-lock.json
 dist/
 build/
 
-# IDE and OS files
+# IDE, agent, and OS files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+.agents/
+skills-lock.json
 
 # Temporary extracted files
 seedData_extracted/
 *.log
+
